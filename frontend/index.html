@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+                <li id="adminLink" style="display: none;"><a href="/admin.html">Admin</a></li>
+                <li><a href="/login.html" class="btn btn-primary" id="loginBtn">Login</a></li>
+                <li><button onclick="logout()" class="btn btn-primary" id="logoutBtn" style="display: none;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white; padding: 4rem 2rem; text-align: center;">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem; font-family: 'Roboto Condensed', sans-serif;">Welcome to NPL Cricket Tournament</h1>
+                <p style="font-size: 1.3rem; margin-bottom: 2rem;">Experience the thrill of competitive cricket</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/schedule.html" class="btn btn-primary" style="background: white; color: #2E7D32;">View Schedule</a>
+                    <a href="/teams.html" class="btn btn-secondary">Explore Teams</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tournament Overview -->
+        <div class="container">
+            <div class="page-header">
+                <h2 style="color: #2E7D32;">Tournament Overview</h2>
+                <p id="tournamentName">Loading tournament information...</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-3 mb-2">
+                <div class="card text-center">
+                    <h3 style="font-size: 3rem; color: #2E7D32; margin-bottom: 0.5rem;" id="totalTeams">-</h3>
+                    <p style="color: #757575; font-weight: 500;">Teams Participating</p>
+                </div>
+                <div class="card text-center">
+                    <h3 style="font-size: 3rem; color: #2E7D32; margin-bottom: 0.5rem;" id="totalMatches">-</h3>
+                    <p style="color: #757575; font-weight: 500;">Total Matches</p>
+                </div>
+                <div class="card text-center">
+                    <h3 style="font-size: 3rem; color: #2E7D32; margin-bottom: 0.5rem;" id="totalPlayers">-</h3>
+                    <p style="color: #757575; font-weight: 500;">Total Players</p>
+                </div>
+            </div>
+
+            <!-- Latest Matches -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Latest Match Results</h3>
+                </div>
+                <div id="latestMatches">
+                    <div class="loading">Loading latest matches...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+        <p>Powered by passion for cricket</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // Load tournament info
+        async function loadTournamentInfo() {
+            try {
+                const response = await fetch('/api/tournament/settings');
+                const data = await response.json();
+                document.getElementById('tournamentName').textContent = data.tournament_name || 'NPL Cricket Tournament 2024';
+            } catch (error) {
+                console.error('Failed to load tournament info:', error);
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const [teamsRes, matchesRes, playersRes] = await Promise.all([
+                    fetch('/api/teams'),
+                    fetch('/api/matches'),
+                    fetch('/api/players')
+                ]);
+
+                const teams = await teamsRes.json();
+                const matches = await matchesRes.json();
+                const players = await playersRes.json();
+
+                document.getElementById('totalTeams').textContent = teams.length;
+                document.getElementById('totalMatches').textContent = matches.length;
+                document.getElementById('totalPlayers').textContent = players.length;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load latest matches
+        async function loadLatestMatches() {
+            try {
+                const response = await fetch('/api/matches');
+                const matches = await response.json();
+
+                // Filter completed matches and get latest 3
+                const completedMatches = matches
+                    .filter(m => m.status === 'completed' && m.winner_id)
+                    .sort((a, b) => new Date(b.match_date) - new Date(a.match_date))
+                    .slice(0, 3);
+
+                const container = document.getElementById('latestMatches');
+
+                if (completedMatches.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No completed matches yet</div>';
+                    return;
+                }
+
+                container.innerHTML = completedMatches.map(match => `
+                    <div class="card mb-1" style="border-left: 4px solid #2E7D32;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <strong style="color: #2E7D32;">${match.team_a_name} vs ${match.team_b_name}</strong>
+                                <p style="color: #757575; font-size: 0.9rem;">${formatDate(match.match_date)} - ${match.round}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-weight: bold; color: #4CAF50;">Winner: ${match.winner_name}</p>
+                                <p style="font-size: 0.9rem;">${match.result_summary || ''}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load matches:', error);
+                document.getElementById('latestMatches').innerHTML = '<div class="empty-state">Failed to load matches</div>';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTournamentInfo();
+            loadStats();
+            loadLatestMatches();
+        });
+    </script>
+</body>
+</html>

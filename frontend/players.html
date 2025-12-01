@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+                <li id="adminLink" style="display: none;"><a href="/admin.html">Admin</a></li>
+                <li><a href="/login.html" class="btn btn-primary" id="loginBtn">Login</a></li>
+                <li><button onclick="logout()" class="btn btn-primary" id="logoutBtn" style="display: none;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Tournament Players</h1>
+                <p>View all players and their statistics</p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="card mb-2">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="Search players..."
+                           style="flex: 1; min-width: 250px; padding: 0.8rem; border: 2px solid #E0E0E0; border-radius: 8px;">
+                    <select id="sortSelect"
+                            style="padding: 0.8rem; border: 2px solid #E0E0E0; border-radius: 8px;">
+                        <option value="name">Sort by Name</option>
+                        <option value="runs">Sort by Runs</option>
+                        <option value="wickets">Sort by Wickets</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-2" id="playersGrid">
+                <div class="loading">Loading players...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        let allPlayers = [];
+
+        async function loadPlayers() {
+            try {
+                const response = await fetch('/api/players');
+                allPlayers = await response.json();
+                displayPlayers();
+            } catch (error) {
+                console.error('Failed to load players:', error);
+                document.getElementById('playersGrid').innerHTML =
+                    '<div class="empty-state">Failed to load players</div>';
+            }
+        }
+
+        function displayPlayers() {
+            const grid = document.getElementById('playersGrid');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sortBy = document.getElementById('sortSelect').value;
+
+            let filtered = allPlayers.filter(player =>
+                player.name.toLowerCase().includes(searchTerm) ||
+                player.team_name.toLowerCase().includes(searchTerm) ||
+                player.role.toLowerCase().includes(searchTerm)
+            );
+
+            // Sort players
+            filtered.sort((a, b) => {
+                if (sortBy === 'runs') {
+                    return (b.runs_scored || 0) - (a.runs_scored || 0);
+                } else if (sortBy === 'wickets') {
+                    return (b.wickets_taken || 0) - (a.wickets_taken || 0);
+                } else {
+                    return a.name.localeCompare(b.name);
+                }
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No players found</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(player => `
+                <div class="card player-card">
+                    <img src="${player.photo_path || '/images/default-logo.png'}"
+                         alt="${player.name}"
+                         class="player-photo"
+                         onerror="this.src='/images/default-logo.png'">
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-role">${player.role} • ${player.team_name}</div>
+                        <div class="player-stats">
+                            <div class="stat">
+                                <span class="stat-value">${player.runs_scored || 0}</span> Runs
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${player.wickets_taken || 0}</span> Wickets
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${player.catches || 0}</span> Catches
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', displayPlayers);
+        document.getElementById('sortSelect').addEventListener('change', displayPlayers);
+        document.addEventListener('DOMContentLoaded', loadPlayers);
+    </script>
+</body>
+</html>

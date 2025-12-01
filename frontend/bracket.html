@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Bracket - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Professional Tournament Bracket Styling */
+        .bracket-wrapper {
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFFFFF 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .bracket-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .bracket-header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #2E7D32, transparent);
+            border-radius: 2px;
+        }
+
+        .bracket-header h2 {
+            font-size: 2rem;
+            color: #2E7D32;
+            font-family: 'Roboto Condensed', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .bracket-header p {
+            color: #757575;
+            font-size: 1.1rem;
+        }
+
+        .bracket-container {
+            display: flex;
+            gap: 3rem;
+            overflow-x: auto;
+            padding: 2rem 1rem;
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        .bracket-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .bracket-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .bracket-container::-webkit-scrollbar-thumb {
+            background: #2E7D32;
+            border-radius: 10px;
+        }
+
+        .bracket-container::-webkit-scrollbar-thumb:hover {
+            background: #1B5E20;
+        }
+
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .bracket-round-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            background: #FFFFFF;
+            padding: 1rem 0;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+            z-index: 10;
+        }
+
+        .bracket-round-header h3 {
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.2rem;
+            margin: 0;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bracket-round-header h3::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .bracket-round-header h3:hover::before {
+            left: 100%;
+        }
+
+        .bracket-match {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border: 2px solid #E0E0E0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bracket-match::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: linear-gradient(180deg, #2E7D32 0%, #4CAF50 100%);
+        }
+
+        .bracket-match:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(46, 125, 50, 0.15);
+            border-color: #2E7D32;
+        }
+
+        .match-versus {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #C62828;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            letter-spacing: 1px;
+        }
+
+        .bracket-team {
+            padding: 0.9rem 1rem;
+            margin: 0.4rem 0;
+            background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 1px solid #E0E0E0;
+            position: relative;
+        }
+
+        .bracket-team:hover {
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+            transform: translateX(3px);
+        }
+
+        .bracket-team.winner {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border: 2px solid #4CAF50;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+            position: relative;
+        }
+
+        .bracket-team.winner::after {
+            content: '🏆';
+            position: absolute;
+            right: -8px;
+            top: -8px;
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .bracket-team.winner .team-name {
+            color: #2E7D32;
+        }
+
+        .team-name {
+            flex: 1;
+            font-weight: 500;
+            color: #212121;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-name::before {
+            content: '▶';
+            color: #2E7D32;
+            font-size: 0.7rem;
+        }
+
+        .team-score {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #C62828;
+            background: #FFF8E1;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .match-info {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #E0E0E0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .match-date {
+            color: #757575;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .match-date::before {
+            content: '📅';
+            font-size: 0.9rem;
+        }
+
+        .match-winner {
+            color: #4CAF50;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: #E8F5E9;
+            border-radius: 15px;
+        }
+
+        .match-winner::before {
+            content: '✓';
+            font-weight: bold;
+        }
+
+        .match-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .match-status.completed {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .match-status.scheduled {
+            background: #FFF8E1;
+            color: #F57C00;
+        }
+
+        /* Final Match Special Styling */
+        .bracket-round:last-child .bracket-match {
+            border: 3px solid #FFD700;
+            background: linear-gradient(135deg, #FFFDE7 0%, #FFFFFF 100%);
+        }
+
+        .bracket-round:last-child .bracket-round-header h3 {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            color: #000000;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #757575;
+        }
+
+        .empty-state::before {
+            content: '🏏';
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading::after {
+            content: '⏳';
+            font-size: 3rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .bracket-container {
+                gap: 2rem;
+                padding: 1rem 0.5rem;
+            }
+
+            .bracket-round {
+                min-width: 250px;
+            }
+
+            .bracket-match {
+                padding: 1rem;
+            }
+
+            .bracket-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Tournament Stats Bar */
+        .tournament-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+            text-align: center;
+        }
+
+        .stat-badge .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-badge .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+                <li id="adminLink" style="display: none;"><a href="/admin.html">Admin</a></li>
+                <li><a href="/login.html" class="btn btn-primary" id="loginBtn">Login</a></li>
+                <li><button onclick="logout()" class="btn btn-primary" id="logoutBtn" style="display: none;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Tournament Bracket</h1>
+                <p>Follow the journey to championship glory</p>
+            </div>
+
+            <div class="tournament-stats" id="tournamentStats" style="display: none;">
+                <div class="stat-badge">
+                    <span class="stat-number" id="totalMatches">0</span>
+                    <span class="stat-label">Total Matches</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-number" id="completedMatches">0</span>
+                    <span class="stat-label">Completed</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-number" id="totalRounds">0</span>
+                    <span class="stat-label">Tournament Rounds</span>
+                </div>
+            </div>
+
+            <div class="bracket-wrapper">
+                <div class="bracket-header">
+                    <h2>🏆 NPL Cricket Tournament 2024</h2>
+                    <p>Championship Bracket</p>
+                </div>
+
+                <div class="bracket-container" id="bracketContainer">
+                    <div class="loading">Loading bracket...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+        <p>May the best team win!</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        async function loadBracket() {
+            try {
+                const response = await fetch('/api/tournament/bracket');
+                const bracket = await response.json();
+
+                const container = document.getElementById('bracketContainer');
+                container.innerHTML = '';
+
+                let totalMatches = 0;
+                let completedMatches = 0;
+                let roundCount = 0;
+
+                // Define round order
+                const roundOrder = ['Round 1', 'Round 2', 'Semi-Final', 'Final'];
+
+                roundOrder.forEach(roundName => {
+                    const matches = bracket[roundName];
+
+                    if (matches && matches.length > 0) {
+                        roundCount++;
+                        totalMatches += matches.length;
+                        completedMatches += matches.filter(m => m.status === 'completed').length;
+
+                        // Sort matches by date and time within each round
+                        const sortedMatches = matches.sort((a, b) => {
+                            const dateCompare = new Date(a.match_date) - new Date(b.match_date);
+                            if (dateCompare !== 0) return dateCompare;
+                            return (a.match_time || '').localeCompare(b.match_time || '');
+                        });
+
+                        const roundDiv = document.createElement('div');
+                        roundDiv.className = 'bracket-round';
+
+                        roundDiv.innerHTML = `
+                            <div class="bracket-round-header">
+                                <h3>${roundName}</h3>
+                            </div>
+                            ${sortedMatches.map(match => `
+                                <div class="bracket-match">
+                                    <div class="bracket-team ${match.winner_id === match.team_a_id ? 'winner' : ''}">
+                                        <span class="team-name">${match.team_a_name}</span>
+                                        ${match.team_a_score ? `<span class="team-score">${match.team_a_score}</span>` : ''}
+                                    </div>
+                                    <div class="match-versus">VS</div>
+                                    <div class="bracket-team ${match.winner_id === match.team_b_id ? 'winner' : ''}">
+                                        <span class="team-name">${match.team_b_name}</span>
+                                        ${match.team_b_score ? `<span class="team-score">${match.team_b_score}</span>` : ''}
+                                    </div>
+                                    <div class="match-info">
+                                        <span class="match-date">${formatDate(match.match_date)}</span>
+                                        ${match.status === 'completed' && match.winner_name ?
+                                            `<span class="match-winner">${match.winner_name}</span>` :
+                                            `<span class="match-status ${match.status}">${match.status}</span>`
+                                        }
+                                    </div>
+                                </div>
+                            `).join('')}
+                        `;
+
+                        container.appendChild(roundDiv);
+                    }
+                });
+
+                // Update stats
+                if (totalMatches > 0) {
+                    document.getElementById('totalMatches').textContent = totalMatches;
+                    document.getElementById('completedMatches').textContent = completedMatches;
+                    document.getElementById('totalRounds').textContent = roundCount;
+                    document.getElementById('tournamentStats').style.display = 'flex';
+                }
+
+                if (container.innerHTML === '') {
+                    container.innerHTML = '<div class="empty-state">No bracket data available yet<br>Check back soon!</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load bracket:', error);
+                document.getElementById('bracketContainer').innerHTML =
+                    '<div class="empty-state">Failed to load bracket<br>Please try again later</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBracket);
+    </script>
+</body>
+</html>

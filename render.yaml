@@ -1,0 +1,12 @@
+services:
+  # Flask Backend + Frontend Service
+  - type: web
+    name: npl-cricket-tournament
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT backend.app:create_app()
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        generateValue: true

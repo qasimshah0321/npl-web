@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+                <li id="adminLink" style="display: none;"><a href="/admin.html">Admin</a></li>
+                <li><a href="/login.html" class="btn btn-primary" id="loginBtn">Login</a></li>
+                <li><button onclick="logout()" class="btn btn-primary" id="logoutBtn" style="display: none;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Tournament Teams</h1>
+                <p>Explore all participating teams</p>
+            </div>
+
+            <div class="grid grid-3" id="teamsGrid">
+                <div class="loading">Loading teams...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        async function loadTeams() {
+            try {
+                const response = await fetch('/api/teams');
+                const teams = await response.json();
+
+                const grid = document.getElementById('teamsGrid');
+
+                if (teams.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No teams found</div>';
+                    return;
+                }
+
+                grid.innerHTML = teams.map(team => `
+                    <div class="card team-card">
+                        <img src="${team.logo_path || '/images/default-logo.svg'}"
+                             alt="${team.name}"
+                             class="team-logo"
+                             onerror="this.src='/images/default-logo.svg'"
+                             loading="lazy">
+                        <div class="team-name">${team.name}</div>
+                        <div class="team-info">
+                            <p><strong>Captain:</strong> ${team.captain_name || 'TBA'}</p>
+                            <p><strong>Coach:</strong> ${team.coach_name || 'TBA'}</p>
+                            <p><strong>Home Ground:</strong> ${team.home_ground || 'TBA'}</p>
+                            <p><strong>Players:</strong> ${team.player_count || 0}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load teams:', error);
+                document.getElementById('teamsGrid').innerHTML =
+                    '<div class="empty-state">Failed to load teams</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTeams);
+    </script>
+</body>
+</html>

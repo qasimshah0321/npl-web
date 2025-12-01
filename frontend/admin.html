@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket - Admin</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Public Site</a></li>
+                <li><button onclick="logout()" class="btn btn-primary">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="admin-header">
+                <h1>Admin Dashboard</h1>
+                <p>Manage your cricket tournament</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="statTeams">0</h3>
+                    <p>Teams</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="statPlayers">0</h3>
+                    <p>Players</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="statMatches">0</h3>
+                    <p>Matches</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('teams')">Teams</button>
+                <button class="tab-button" onclick="switchTab('players')">Players</button>
+                <button class="tab-button" onclick="switchTab('matches')">Matches</button>
+                <button class="tab-button" onclick="switchTab('tournament')">Tournament</button>
+            </div>
+
+            <!-- Teams Tab -->
+            <div id="teamsTab" class="tab-content active">
+                <div class="admin-actions">
+                    <button class="btn btn-primary" onclick="showAddTeamModal()">Add New Team</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Coach</th>
+                                <th>Home Ground</th>
+                                <th>Players</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamsTableBody">
+                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Players Tab -->
+            <div id="playersTab" class="tab-content">
+                <div class="admin-actions">
+                    <button class="btn btn-primary" onclick="showAddPlayerModal()">Add New Player</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Team</th>
+                                <th>Role</th>
+                                <th>Jersey #</th>
+                                <th>Stats</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersTableBody">
+                            <tr><td colspan="6" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Matches Tab -->
+            <div id="matchesTab" class="tab-content">
+                <div class="admin-actions">
+                    <button class="btn btn-primary" onclick="showAddMatchModal()">Add New Match</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th>Venue</th>
+                                <th>Round</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matchesTableBody">
+                            <tr><td colspan="6" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tournament Tab -->
+            <div id="tournamentTab" class="tab-content">
+                <div class="card">
+                    <h3>Tournament Settings</h3>
+                    <form id="tournamentForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tournament Name</label>
+                                <input type="text" id="tournamentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Teams</label>
+                                <input type="number" id="totalTeams" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" id="endDate">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Team Modal -->
+    <div id="teamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="teamModalTitle">Add Team</h3>
+                <button class="close-modal" onclick="closeModal('teamModal')">&times;</button>
+            </div>
+            <form id="teamForm">
+                <input type="hidden" id="teamId">
+                <div class="form-group">
+                    <label>Team Name *</label>
+                    <input type="text" id="teamName" required>
+                </div>
+                <div class="form-group">
+                    <label>Coach Name</label>
+                    <input type="text" id="coachName">
+                </div>
+                <div class="form-group">
+                    <label>Home Ground</label>
+                    <input type="text" id="homeGround">
+                </div>
+                <div class="form-group">
+                    <label>Team Logo</label>
+                    <input type="file" id="teamLogo" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Team</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Player Modal -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="playerModalTitle">Add Player</h3>
+                <button class="close-modal" onclick="closeModal('playerModal')">&times;</button>
+            </div>
+            <form id="playerForm">
+                <input type="hidden" id="playerId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Player Name *</label>
+                        <input type="text" id="playerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Team *</label>
+                        <select id="playerTeam" required></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Role *</label>
+                        <select id="playerRole" required>
+                            <option value="">Select Role</option>
+                            <option value="batsman">Batsman</option>
+                            <option value="bowler">Bowler</option>
+                            <option value="all-rounder">All-Rounder</option>
+                            <option value="wicket-keeper">Wicket-Keeper</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jersey Number</label>
+                        <input type="number" id="jerseyNumber">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Batting Style</label>
+                        <select id="battingStyle">
+                            <option value="">Select Style</option>
+                            <option value="right-hand">Right-Hand</option>
+                            <option value="left-hand">Left-Hand</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bowling Style</label>
+                        <input type="text" id="bowlingStyle" placeholder="e.g., Right-arm fast">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Player</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Match Modal -->
+    <div id="matchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="matchModalTitle">Add Match</h3>
+                <button class="close-modal" onclick="closeModal('matchModal')">&times;</button>
+            </div>
+            <form id="matchForm">
+                <input type="hidden" id="matchId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Match Date *</label>
+                        <input type="date" id="matchDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Match Time</label>
+                        <input type="time" id="matchTime">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team A *</label>
+                        <select id="teamA" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Team B *</label>
+                        <select id="teamB" required></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue</label>
+                        <input type="text" id="venue">
+                    </div>
+                    <div class="form-group">
+                        <label>Round *</label>
+                        <select id="round" required>
+                            <option value="Round 1">Round 1</option>
+                            <option value="Round 2">Round 2</option>
+                            <option value="Semi-Final">Semi-Final</option>
+                            <option value="Final">Final</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Match</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Match Result Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Match Result</h3>
+                <button class="close-modal" onclick="closeModal('resultModal')">&times;</button>
+            </div>
+            <form id="resultForm">
+                <input type="hidden" id="resultMatchId">
+                <div class="form-group">
+                    <label>Winner *</label>
+                    <select id="winnerId" required></select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team A Score</label>
+                        <input type="text" id="teamAScore" placeholder="e.g., 185/7 (20)">
+                    </div>
+                    <div class="form-group">
+                        <label>Team B Score</label>
+                        <input type="text" id="teamBScore" placeholder="e.g., 160/9 (20)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Result Summary</label>
+                    <input type="text" id="resultSummary" placeholder="e.g., Team A won by 25 runs">
+                </div>
+                <button type="submit" class="btn btn-primary">Update Result</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

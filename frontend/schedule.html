@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Schedule - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+                <li id="adminLink" style="display: none;"><a href="/admin.html">Admin</a></li>
+                <li><a href="/login.html" class="btn btn-primary" id="loginBtn">Login</a></li>
+                <li><button onclick="logout()" class="btn btn-primary" id="logoutBtn" style="display: none;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Match Schedule</h1>
+                <p>View all tournament matches and results</p>
+            </div>
+
+            <!-- Round Filter -->
+            <div class="mb-2" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <button onclick="filterRound('all')" class="btn btn-secondary" id="filterAll">All Matches</button>
+                <button onclick="filterRound('Round 1')" class="btn btn-secondary" id="filterRound1">Round 1</button>
+                <button onclick="filterRound('Round 2')" class="btn btn-secondary" id="filterRound2">Round 2</button>
+                <button onclick="filterRound('Semi-Final')" class="btn btn-secondary" id="filterSemiFinal">Semi-Finals</button>
+                <button onclick="filterRound('Final')" class="btn btn-secondary" id="filterFinal">Finals</button>
+            </div>
+
+            <!-- Matches Table -->
+            <div class="table-container">
+                <table id="matchesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Match</th>
+                            <th>Venue</th>
+                            <th>Round</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matchesBody">
+                        <tr>
+                            <td colspan="6" class="loading">Loading matches...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        let allMatches = [];
+        let currentFilter = 'all';
+
+        async function loadMatches() {
+            try {
+                const response = await fetch('/api/matches');
+                allMatches = await response.json();
+                displayMatches();
+            } catch (error) {
+                console.error('Failed to load matches:', error);
+                document.getElementById('matchesBody').innerHTML =
+                    '<tr><td colspan="6" class="empty-state">Failed to load matches</td></tr>';
+            }
+        }
+
+        function displayMatches() {
+            const tbody = document.getElementById('matchesBody');
+
+            let filteredMatches = allMatches;
+            if (currentFilter !== 'all') {
+                filteredMatches = allMatches.filter(m => m.round === currentFilter);
+            }
+
+            // Sort matches by date and time
+            filteredMatches.sort((a, b) => {
+                const dateCompare = new Date(a.match_date) - new Date(b.match_date);
+                if (dateCompare !== 0) return dateCompare;
+                return (a.match_time || '').localeCompare(b.match_time || '');
+            });
+
+            if (filteredMatches.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No matches found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredMatches.map(match => `
+                <tr>
+                    <td>${formatDate(match.match_date)}</td>
+                    <td>${match.match_day}</td>
+                    <td><strong>${match.team_a_name} vs ${match.team_b_name}</strong></td>
+                    <td>${match.venue || 'TBD'}</td>
+                    <td><span style="background: #2E7D32; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">${match.round}</span></td>
+                    <td>
+                        ${match.status === 'completed' && match.winner_name
+                            ? `<span class="winner-name">${match.winner_name}</span><br><small style="color: #757575;">${match.result_summary || ''}</small>`
+                            : `<span style="color: #757575;">${match.status === 'in_progress' ? 'In Progress' : 'Scheduled'}</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterRound(round) {
+            currentFilter = round;
+            displayMatches();
+
+            // Update button styles
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = '#2E7D32';
+            });
+
+            const activeBtn = document.getElementById(`filter${round.replace(/\s+/g, '')}`);
+            if (activeBtn) {
+                activeBtn.style.background = '#2E7D32';
+                activeBtn.style.color = 'white';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMatches();
+            filterRound('all');
+        });
+    </script>
+</body>
+</html>

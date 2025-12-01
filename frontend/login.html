@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NPL Cricket Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NPL Cricket</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/schedule.html">Schedule</a></li>
+                <li><a href="/teams.html">Teams</a></li>
+                <li><a href="/players.html">Players</a></li>
+                <li><a href="/bracket.html">Bracket</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container" style="max-width: 500px; margin-top: 4rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="text-align: center;">Admin Login</h3>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="remember" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+
+                    <div id="errorMessage" style="color: #C62828; margin-bottom: 1rem; display: none;"></div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #E0E0E0;">
+                    <p style="color: #757575;">Default credentials:</p>
+                    <p style="color: #757575; font-size: 0.9rem;">Username: <strong>admin</strong> | Password: <strong>admin123</strong></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 NPL Cricket Tournament. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const errorMessage = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password, remember })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect to admin page if admin, otherwise home
+                    if (data.user.role === 'admin') {
+                        window.location.href = '/admin.html';
+                    } else {
+                        window.location.href = '/index.html';
+                    }
+                } else {
+                    errorMessage.textContent = data.error || 'Login failed';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = 'An error occurred during login';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
