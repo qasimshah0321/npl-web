@@ -349,9 +349,108 @@
       "team_a": "Unity Boys",
       "team_b": "Team Falcon",
       "result": "Team Falcon"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "Thursday",
+      "time": "6:00 pm",
+      "group": "Round 2",
+      "team_a": "Team Shaheens",
+      "team_b": "Thunderblades",
+      "result": "Team Shaheens"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "Thursday",
+      "time": "6:30 pm",
+      "group": "Round 2",
+      "team_a": "Hcd Challengers",
+      "team_b": "Platform Warriors",
+      "result": "Hcd Challengers"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "Thursday",
+      "time": "7:00 pm",
+      "group": "Round 2",
+      "team_a": "TF Platforms",
+      "team_b": "Nos Champions",
+      "result": "TF Platforms"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "Thursday",
+      "time": "7:30 pm",
+      "group": "Round 2",
+      "team_a": "Thunder Strikers",
+      "team_b": "Team Falcon",
+      "result": "Team Falcon"
+    },
+    {
+      "date": "2025-11-28 00:00:00",
+      "day": "Friday",
+      "time": "6:00 pm",
+      "group": "Round 2",
+      "team_a": "Unity Warrior",
+      "team_b": "Nos Champions",
+      "result": "Unity Warrior"
+    },
+    {
+      "date": "2025-11-28 00:00:00",
+      "day": "Friday",
+      "time": "6:30 pm",
+      "group": "Round 2",
+      "team_a": "Unity Boys",
+      "team_b": "Platform Warriors",
+      "result": "Unity Boys"
+    },
+    {
+      "date": "2025-11-28 00:00:00",
+      "day": "Friday",
+      "time": "7:00 pm",
+      "group": "Round 2",
+      "team_a": "Thunderblades",
+      "team_b": "Team Ps Ai",
+      "result": "Thunderblades"
+    },
+    {
+      "date": "2025-12-01 00:00:00",
+      "day": "Monday",
+      "time": "1:00 pm",
+      "group": "Round 2",
+      "team_a": "Hcd Challengers",
+      "team_b": "Unity Boys",
+      "result": "Unity Boys"
+    },
+    {
+      "date": "2025-12-01 00:00:00",
+      "day": "Monday",
+      "time": "1:30 pm",
+      "group": "Round 2",
+      "team_a": "Team Ps Ai",
+      "team_b": "Team Shaheens",
+      "result": "Team Shaheens"
+    },
+    {
+      "date": "2025-12-01 00:00:00",
+      "day": "Monday",
+      "time": "6:00 pm",
+      "group": "Round 2",
+      "team_a": "Unity Warrior",
+      "team_b": "TF Platforms",
+      "result": "TF Platforms"
+    },
+    {
+      "date": "2025-12-01 00:00:00",
+      "day": "Monday",
+      "time": "6:30 pm",
+      "group": "Round 2",
+      "team_a": "Tech Maverick",
+      "team_b": "Team Falcon",
+      "result": "Team Falcon"
     }
   ],
   "tournament_name": "NPL Season 7",
   "total_teams": 24,
-  "total_matches": 36
+  "total_matches": 47
 }
