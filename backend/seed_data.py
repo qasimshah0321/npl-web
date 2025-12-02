@@ -7,7 +7,7 @@ import os
 # Add parent directory to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from backend.database import get_db_connection
+from backend.database import get_db_connection, init_db
 from datetime import datetime, timedelta
 
 
@@ -282,6 +282,11 @@ def main():
     print("="*60)
     print("NPL Cricket Tournament - Database Seed Script")
     print("="*60)
+
+    # Initialize database tables first
+    print("\nInitializing database tables...")
+    init_db()
+    print("Database tables initialized.")
 
     conn = get_db_connection()
 
