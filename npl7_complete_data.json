@@ -1,0 +1,357 @@
+{
+  "teams": [
+    "Ascent 1.0",
+    "China Dragon JF17",
+    "Hcd Challengers",
+    "Kings",
+    "Market Maverick",
+    "Nos Champions",
+    "Platform Warriors",
+    "Power 11",
+    "TF Platforms",
+    "Team Accounts",
+    "Team Cafe",
+    "Team Cs",
+    "Team Delivery",
+    "Team Digital",
+    "Team Falcon",
+    "Team Ps Ai",
+    "Team Shaheens",
+    "Tech Maverick",
+    "Thunder Strikers",
+    "Thunderblades",
+    "Transcend Strikers",
+    "Unity Boys",
+    "Unity Warrior",
+    "Wfs Warrior"
+  ],
+  "matches": [
+    {
+      "date": "2025-11-17 00:00:00",
+      "day": "TBD",
+      "time": "13:00:00",
+      "group": 1,
+      "team_a": "Team Shaheens",
+      "team_b": "Kings",
+      "result": "Team Shaheens"
+    },
+    {
+      "date": "2025-11-17 00:00:00",
+      "day": "TBD",
+      "time": "13:25:00",
+      "group": 1,
+      "team_a": "Team Cs",
+      "team_b": "Team Ps Ai",
+      "result": "Team Cs"
+    },
+    {
+      "date": "2025-11-17 00:00:00",
+      "day": "Monday",
+      "time": "18:00:00",
+      "group": 1,
+      "team_a": "Team Ps Ai",
+      "team_b": "Team Shaheens",
+      "result": "Team Shaheens"
+    },
+    {
+      "date": "2025-11-17 00:00:00",
+      "day": "Monday",
+      "time": "18:20:00",
+      "group": 1,
+      "team_a": "Team Ps Ai",
+      "team_b": "Kings",
+      "result": "Team Ps Ai"
+    },
+    {
+      "date": "2025-11-17 00:00:00",
+      "day": "Monday",
+      "time": "6:40pm",
+      "group": 1,
+      "team_a": "Team Shaheens",
+      "team_b": "Team Cs",
+      "result": "Team Shaheens"
+    },
+    {
+      "date": "2025-11-18 00:00:00",
+      "day": "Tuesday",
+      "time": "13:00:00",
+      "group": 2,
+      "team_a": "Thunderblades",
+      "team_b": "Ascent 1.0",
+      "result": "Thunderblades"
+    },
+    {
+      "date": "2025-11-18 00:00:00",
+      "day": "Tuesday",
+      "time": "13:25:00",
+      "group": 2,
+      "team_a": "TF Platforms",
+      "team_b": "Power 11",
+      "result": "TF Platforms"
+    },
+    {
+      "date": "2025-11-18 00:00:00",
+      "day": "Tuesday",
+      "time": "18:00:00",
+      "group": 2,
+      "team_a": "Thunderblades",
+      "team_b": "Power 11",
+      "result": "Thunderblades"
+    },
+    {
+      "date": "2025-11-18 00:00:00",
+      "day": "Tuesday",
+      "time": "18:20:00",
+      "group": 2,
+      "team_a": "TF Platforms",
+      "team_b": "Ascent 1.0",
+      "result": "TF Platforms"
+    },
+    {
+      "date": "2025-11-18 00:00:00",
+      "day": "Tuesday",
+      "time": "6:40pm",
+      "group": 2,
+      "team_a": "Thunderblades",
+      "team_b": "TF Platforms",
+      "result": "Thunderblades"
+    },
+    {
+      "date": "2025-11-19 00:00:00",
+      "day": "Wednesday",
+      "time": "13:00:00",
+      "group": 3,
+      "team_a": "Hcd Challengers",
+      "team_b": "Team Accounts",
+      "result": "Hcd Challengers"
+    },
+    {
+      "date": "2025-11-19 00:00:00",
+      "day": "Wednesday",
+      "time": "13:25:00",
+      "group": 3,
+      "team_a": "Platform Warriors",
+      "team_b": "Transcend Strikers",
+      "result": "Transcend Strikers"
+    },
+    {
+      "date": "2025-11-19 00:00:00",
+      "day": "Wednesday",
+      "time": "18:00:00",
+      "group": 3,
+      "team_a": "Team Accounts",
+      "team_b": "Platform Warriors",
+      "result": "Platform Warriors"
+    },
+    {
+      "date": "2025-11-19 00:00:00",
+      "day": "Wednesday",
+      "time": "18:20:00",
+      "group": 3,
+      "team_a": "Team Accounts",
+      "team_b": "Transcend Strikers",
+      "result": "Team Accounts"
+    },
+    {
+      "date": "2025-11-19 00:00:00",
+      "day": "Wednesday",
+      "time": "6:40pm",
+      "group": 3,
+      "team_a": "Platform Warriors",
+      "team_b": "Hcd Challengers",
+      "result": "Platform Warriors"
+    },
+    {
+      "date": "2025-11-20 00:00:00",
+      "day": "Thursday",
+      "time": "13:00:00",
+      "group": 4,
+      "team_a": "Unity Warrior",
+      "team_b": "Thunder Strikers",
+      "result": "Thunder Strikers"
+    },
+    {
+      "date": "2025-11-20 00:00:00",
+      "day": "Thursday",
+      "time": "13:25:00",
+      "group": 4,
+      "team_a": "Team Digital",
+      "team_b": "Market Maverick",
+      "result": "Team Digital"
+    },
+    {
+      "date": "2025-11-20 00:00:00",
+      "day": "Thursday",
+      "time": "18:00:00",
+      "group": 4,
+      "team_a": "Unity Warrior",
+      "team_b": "Thunder Strikers",
+      "result": "Unity Warrior"
+    },
+    {
+      "date": "2025-11-20 00:00:00",
+      "day": "Thursday",
+      "time": "18:20:00",
+      "group": 4,
+      "team_a": "Market Maverick",
+      "team_b": "Thunder Strikers",
+      "result": "Thunder Strikers"
+    },
+    {
+      "date": "2025-11-20 00:00:00",
+      "day": "Thursday",
+      "time": "6:40pm",
+      "group": 4,
+      "team_a": "Market Maverick",
+      "team_b": "Team Digital",
+      "result": "Team Digital"
+    },
+    {
+      "date": "2025-11-24 00:00:00",
+      "day": "TBD",
+      "time": "13:00:00",
+      "group": 5,
+      "team_a": "Wfs Warrior",
+      "team_b": "Team Falcon",
+      "result": "Team Falcon"
+    },
+    {
+      "date": "2025-11-24 00:00:00",
+      "day": "TBD",
+      "time": "13:25:00",
+      "group": 5,
+      "team_a": "China Dragon JF17",
+      "team_b": "Unity Boys",
+      "result": "Unity Boys"
+    },
+    {
+      "date": "2025-11-24 00:00:00",
+      "day": "Monday",
+      "time": "18:00:00",
+      "group": 5,
+      "team_a": "Team Falcon",
+      "team_b": "China Dragon JF17",
+      "result": "Team Falcon"
+    },
+    {
+      "date": "2025-11-24 00:00:00",
+      "day": "Monday",
+      "time": "18:20:00",
+      "group": 5,
+      "team_a": "Wfs Warrior",
+      "team_b": "Unity Boys",
+      "result": "Unity Boys"
+    },
+    {
+      "date": "2025-11-24 00:00:00",
+      "day": "Monday",
+      "time": "6:40pm",
+      "group": 5,
+      "team_a": "China Dragon JF17",
+      "team_b": "Wfs Warrior",
+      "result": "China Dragon JF17"
+    },
+    {
+      "date": "2025-11-25 00:00:00",
+      "day": "Tuesday",
+      "time": "13:00:00",
+      "group": 6,
+      "team_a": "Nos Champions",
+      "team_b": "Team Delivery",
+      "result": "Nos Champions"
+    },
+    {
+      "date": "2025-11-25 00:00:00",
+      "day": "Tuesday",
+      "time": "13:25:00",
+      "group": 6,
+      "team_a": "Team Delivery",
+      "team_b": "Tech Maverick",
+      "result": "Team Delivery"
+    },
+    {
+      "date": "2025-11-25 00:00:00",
+      "day": "Tuesday",
+      "time": "18:00:00",
+      "group": 6,
+      "team_a": "Team Cafe",
+      "team_b": "Nos Champions",
+      "result": "Nos Champions"
+    },
+    {
+      "date": "2025-11-25 00:00:00",
+      "day": "Tuesday",
+      "time": "18:20:00",
+      "group": 6,
+      "team_a": "Team Cafe",
+      "team_b": "Team Delivery",
+      "result": "Team Cafe"
+    },
+    {
+      "date": "2025-11-25 00:00:00",
+      "day": "Tuesday",
+      "time": "6:40pm",
+      "group": 6,
+      "team_a": "Team Cafe",
+      "team_b": "Tech Maverick",
+      "result": "Tech Maverick"
+    },
+    {
+      "date": "2025-11-26 00:00:00",
+      "day": "Wednesday",
+      "time": "13:00:00",
+      "group": 1,
+      "team_a": "Kings",
+      "team_b": "Team Cs",
+      "result": "Kings"
+    },
+    {
+      "date": "2025-11-26 00:00:00",
+      "day": "Wednesday",
+      "time": "01:25pm",
+      "group": 2,
+      "team_a": "Power 11",
+      "team_b": "Ascent 1.0",
+      "result": "Power 11"
+    },
+    {
+      "date": "2025-11-26 00:00:00",
+      "day": "Wednesday",
+      "time": "6:00pm",
+      "group": 3,
+      "team_a": "Hcd Challengers",
+      "team_b": "Transcend Strikers",
+      "result": "Hcd Challengers"
+    },
+    {
+      "date": "2025-11-26 00:00:00",
+      "day": "Wednesday",
+      "time": "6:25pm",
+      "group": 4,
+      "team_a": "Team Digital",
+      "team_b": "Unity Warrior",
+      "result": "Team Digital"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "Thursday",
+      "time": "1:00pm",
+      "group": 4,
+      "team_a": "Tech Maverick",
+      "team_b": "Nos Champions",
+      "result": "Nos Champions"
+    },
+    {
+      "date": "2025-11-27 00:00:00",
+      "day": "TBD",
+      "time": "1:25pm",
+      "group": 5,
+      "team_a": "Unity Boys",
+      "team_b": "Team Falcon",
+      "result": "Team Falcon"
+    }
+  ],
+  "tournament_name": "NPL Season 7",
+  "total_teams": 24,
+  "total_matches": 36
+}

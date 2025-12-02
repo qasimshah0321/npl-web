@@ -1,8 +1,9 @@
 """
-Seed script to populate NPL Cricket Tournament database with initial data
+Seed script to populate NPL Cricket Tournament database with NPL Season 7 data
 """
 import sys
 import os
+import json
 
 # Add parent directory to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,63 +25,31 @@ def clear_existing_data(conn):
     print("Existing data cleared.")
 
 
-def seed_teams(conn):
-    """Seed teams data"""
+def load_npl7_data():
+    """Load NPL 7 data from JSON file"""
+    json_path = os.path.join(os.path.dirname(__file__), '..', 'npl7_complete_data.json')
+    with open(json_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def seed_teams(conn, npl_data):
+    """Seed teams data from NPL 7"""
     cursor = conn.cursor()
 
-    teams = [
-        {
-            'name': 'Kathmandu Kings XI',
-            'coach_name': 'Rajesh Sharma',
-            'home_ground': 'TU Cricket Ground, Kirtipur'
-        },
-        {
-            'name': 'Pokhara Rhinos',
-            'coach_name': 'Binod Thapa',
-            'home_ground': 'Pokhara Rangasala'
-        },
-        {
-            'name': 'Chitwan Tigers',
-            'coach_name': 'Sanjay Gurung',
-            'home_ground': 'Chitwan Cricket Stadium'
-        },
-        {
-            'name': 'Biratnagar Warriors',
-            'coach_name': 'Dinesh Rai',
-            'home_ground': 'Biratnagar Sports Complex'
-        },
-        {
-            'name': 'Lalitpur Patriots',
-            'coach_name': 'Kiran Bajracharya',
-            'home_ground': 'Satdobato Cricket Ground'
-        },
-        {
-            'name': 'Bhaktapur Legends',
-            'coach_name': 'Prakash Tamang',
-            'home_ground': 'Bhaktapur Sports Arena'
-        },
-        {
-            'name': 'Butwal Blasters',
-            'coach_name': 'Ramesh Poudel',
-            'home_ground': 'Butwal Stadium'
-        },
-        {
-            'name': 'Dhangadhi Thunders',
-            'coach_name': 'Anil Chaudhary',
-            'home_ground': 'Dhangadhi Cricket Ground'
-        }
-    ]
+    teams = npl_data['teams']
 
-    print("\nSeeding teams...")
-    team_ids = []
-    for team in teams:
+    print(f"\nSeeding {len(teams)} teams...")
+    team_ids = {}
+
+    for team_name in teams:
         cursor.execute(
             '''INSERT INTO teams (name, coach_name, home_ground)
                VALUES (?, ?, ?)''',
-            (team['name'], team['coach_name'], team['home_ground'])
+            (team_name, 'TBD', 'TBD')
         )
-        team_ids.append(cursor.lastrowid)
-        print(f"  [+] Added: {team['name']}")
+        team_id = cursor.lastrowid
+        team_ids[team_name] = team_id
+        print(f"  [+] Added: {team_name}")
 
     conn.commit()
     return team_ids
@@ -90,11 +59,7 @@ def seed_players(conn, team_ids):
     """Seed players data for all teams"""
     cursor = conn.cursor()
 
-    # Sample players for each team (11 players per team)
-    batting_styles = ['Right-hand', 'Left-hand']
-    bowling_styles = ['Right-arm Fast', 'Left-arm Fast', 'Right-arm Spin', 'Left-arm Spin', 'Right-arm Medium']
-    roles = ['Batsman', 'Bowler', 'All-rounder', 'Wicket-keeper']
-
+    # Player templates (11 players per team)
     player_templates = [
         {'role': 'Batsman', 'batting_style': 'Right-hand', 'bowling_style': None},
         {'role': 'Batsman', 'batting_style': 'Left-hand', 'bowling_style': None},
@@ -115,9 +80,7 @@ def seed_players(conn, team_ids):
     print("\nSeeding players...")
     player_count = 0
 
-    for idx, team_id in enumerate(team_ids):
-        cursor.execute('SELECT name FROM teams WHERE id = ?', (team_id,))
-        team_name = cursor.fetchone()[0]
+    for idx, (team_name, team_id) in enumerate(team_ids.items()):
         print(f"  Adding players for {team_name}...")
 
         for jersey_num, template in enumerate(player_templates, start=1):
@@ -152,109 +115,63 @@ def seed_players(conn, team_ids):
     print(f"  [+] Added {player_count} players across all teams")
 
 
-def seed_matches(conn, team_ids):
-    """Seed match schedule"""
+def seed_matches(conn, team_ids, npl_data):
+    """Seed match schedule from NPL 7 data"""
     cursor = conn.cursor()
 
-    # Quarter-finals schedule (8 teams, 4 matches)
-    base_date = datetime(2024, 12, 15)
+    matches = npl_data['matches']
 
-    print("\nSeeding matches...")
+    print(f"\nSeeding {len(matches)} matches...")
 
-    # Quarter-finals
-    quarter_finals = [
-        {
-            'team_a': team_ids[0],  # Kathmandu Kings XI
-            'team_b': team_ids[1],  # Pokhara Rhinos
-            'venue': 'TU Cricket Ground, Kirtipur',
-            'date': base_date,
-            'time': '10:00 AM'
-        },
-        {
-            'team_a': team_ids[2],  # Chitwan Tigers
-            'team_b': team_ids[3],  # Biratnagar Warriors
-            'venue': 'TU Cricket Ground, Kirtipur',
-            'time': '02:00 PM',
-            'date': base_date
-        },
-        {
-            'team_a': team_ids[4],  # Lalitpur Patriots
-            'team_b': team_ids[5],  # Bhaktapur Legends
-            'venue': 'Satdobato Cricket Ground',
-            'date': base_date + timedelta(days=1),
-            'time': '10:00 AM'
-        },
-        {
-            'team_a': team_ids[6],  # Butwal Blasters
-            'team_b': team_ids[7],  # Dhangadhi Thunders
-            'venue': 'Satdobato Cricket Ground',
-            'date': base_date + timedelta(days=1),
-            'time': '02:00 PM'
-        }
-    ]
+    matches_added = 0
+    for match_data in matches:
+        team_a_name = match_data['team_a']
+        team_b_name = match_data['team_b']
 
-    for match in quarter_finals:
+        # Get team IDs
+        team_a_id = team_ids.get(team_a_name)
+        team_b_id = team_ids.get(team_b_name)
+
+        if not team_a_id or not team_b_id:
+            print(f"  [!] Skipping match: {team_a_name} vs {team_b_name} (team not found)")
+            continue
+
+        # Parse date
+        try:
+            if isinstance(match_data['date'], str):
+                match_date = datetime.strptime(match_data['date'], '%Y-%m-%d %H:%M:%S')
+            else:
+                match_date = match_data['date']
+        except:
+            match_date = datetime(2025, 11, 17)  # Default date
+
+        # Determine round based on group
+        group = match_data.get('group', 'N/A')
+        round_name = f"Group {group}" if group != 'N/A' else "Group Stage"
+
+        # Get winner ID if result exists
+        winner_id = None
+        result_text = match_data.get('result')
+        if result_text:
+            winner_id = team_ids.get(result_text)
+
+        # Determine status
+        status = 'completed' if result_text else 'scheduled'
+
         cursor.execute(
             '''INSERT INTO matches (match_date, match_day, team_a_id, team_b_id,
-               venue, match_time, round, status)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-            (match['date'].strftime('%Y-%m-%d'),
-             match['date'].strftime('%A'),
-             match['team_a'], match['team_b'],
-             match['venue'], match['time'],
-             'Quarter-final', 'scheduled')
+               venue, match_time, round, status, winner_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            (match_date.strftime('%Y-%m-%d'),
+             match_data.get('day', 'TBD'),
+             team_a_id, team_b_id,
+             'TBD', match_data.get('time', 'TBD'),
+             round_name, status, winner_id)
         )
-
-    print(f"  [+] Added 4 Quarter-final matches")
-
-    # Semi-finals (TBD teams)
-    semi_final_date = base_date + timedelta(days=3)
-    semi_finals = [
-        {
-            'venue': 'TU Cricket Ground, Kirtipur',
-            'date': semi_final_date,
-            'time': '10:00 AM'
-        },
-        {
-            'venue': 'TU Cricket Ground, Kirtipur',
-            'date': semi_final_date,
-            'time': '02:00 PM'
-        }
-    ]
-
-    # For semi-finals, we'll use placeholder teams (first 4 teams)
-    for idx, match in enumerate(semi_finals):
-        cursor.execute(
-            '''INSERT INTO matches (match_date, match_day, team_a_id, team_b_id,
-               venue, match_time, round, status)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-            (match['date'].strftime('%Y-%m-%d'),
-             match['date'].strftime('%A'),
-             team_ids[idx * 2], team_ids[idx * 2 + 1],
-             match['venue'], match['time'],
-             'Semi-final', 'scheduled')
-        )
-
-    print(f"  [+] Added 2 Semi-final matches")
-
-    # Final
-    final_date = base_date + timedelta(days=5)
-    cursor.execute(
-        '''INSERT INTO matches (match_date, match_day, team_a_id, team_b_id,
-           venue, match_time, round, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-        (final_date.strftime('%Y-%m-%d'),
-         final_date.strftime('%A'),
-         team_ids[0], team_ids[1],
-         'TU Cricket Ground, Kirtipur',
-         '02:00 PM',
-         'Final', 'scheduled')
-    )
-
-    print(f"  [+] Added 1 Final match")
+        matches_added += 1
 
     conn.commit()
-    print(f"\nTotal matches created: 7")
+    print(f"  [+] Added {matches_added} matches")
 
 
 def update_tournament_settings(conn):
@@ -271,7 +188,7 @@ def update_tournament_settings(conn):
                end_date = ?,
                is_active = 1
            WHERE id = 1''',
-        ('NPL Cricket Tournament 2024', 8, 'Knockout', '2024-12-15', '2024-12-20')
+        ('NPL Season 7', 24, 'Group Stage + Knockout', '2025-11-17', '2025-11-30')
     )
     conn.commit()
     print("  [+] Tournament settings updated")
@@ -280,13 +197,18 @@ def update_tournament_settings(conn):
 def main():
     """Main seeding function"""
     print("="*60)
-    print("NPL Cricket Tournament - Database Seed Script")
+    print("NPL Season 7 - Database Seed Script")
     print("="*60)
 
     # Initialize database tables first
     print("\nInitializing database tables...")
     init_db()
     print("Database tables initialized.")
+
+    # Load NPL 7 data
+    print("\nLoading NPL 7 data from Excel extraction...")
+    npl_data = load_npl7_data()
+    print(f"Loaded {len(npl_data['teams'])} teams and {len(npl_data['matches'])} matches")
 
     conn = get_db_connection()
 
@@ -295,24 +217,26 @@ def main():
         clear_existing_data(conn)
 
         # Seed data
-        team_ids = seed_teams(conn)
+        team_ids = seed_teams(conn, npl_data)
         seed_players(conn, team_ids)
-        seed_matches(conn, team_ids)
+        seed_matches(conn, team_ids, npl_data)
         update_tournament_settings(conn)
 
         print("\n" + "="*60)
         print("Database seeded successfully!")
         print("="*60)
         print("\nSummary:")
-        print(f"  - 8 Teams added")
-        print(f"  - 88 Players added (11 per team)")
-        print(f"  - 7 Matches scheduled (4 QF, 2 SF, 1 Final)")
-        print(f"  - Tournament: NPL Cricket Tournament 2024")
-        print(f"  - Format: Knockout")
+        print(f"  - {len(team_ids)} Teams added")
+        print(f"  - {len(team_ids) * 11} Players added (11 per team)")
+        print(f"  - {len(npl_data['matches'])} Matches scheduled")
+        print(f"  - Tournament: NPL Season 7")
+        print(f"  - Format: Group Stage + Knockout")
         print("="*60)
 
     except Exception as e:
         print(f"\n[ERROR] Error seeding database: {e}")
+        import traceback
+        traceback.print_exc()
         conn.rollback()
         raise
     finally:
