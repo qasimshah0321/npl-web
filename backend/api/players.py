@@ -147,6 +147,35 @@ def delete_player(player_id):
         return jsonify({'error': str(e)}), 500
 
 
+@players_bp.route('/bulk-delete', methods=['POST'])
+@admin_required
+def bulk_delete_players():
+    """Delete multiple players (admin only)"""
+    data = request.get_json()
+
+    if not data or not data.get('player_ids'):
+        return jsonify({'error': 'No player IDs provided'}), 400
+
+    player_ids = data['player_ids']
+
+    if not isinstance(player_ids, list) or len(player_ids) == 0:
+        return jsonify({'error': 'Invalid player IDs format'}), 400
+
+    try:
+        # Create placeholders for SQL query
+        placeholders = ','.join('?' * len(player_ids))
+        query = f'DELETE FROM players WHERE id IN ({placeholders})'
+
+        affected = execute_delete(query, tuple(player_ids))
+
+        return jsonify({
+            'message': f'{affected} player(s) deleted successfully',
+            'deleted_count': affected
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @players_bp.route('/<int:player_id>/photo', methods=['POST'])
 @admin_required
 def upload_photo(player_id):

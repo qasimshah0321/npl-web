@@ -452,3 +452,14 @@ footer {
 footer p {
     margin-bottom: 0.5rem;
 }
+
+/* Bulk Actions */
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}

@@ -33,7 +33,7 @@
 
             <!-- Search and Filter -->
             <div class="card mb-2">
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
                     <input type="text"
                            id="searchInput"
                            placeholder="Search players..."
@@ -44,6 +44,22 @@
                         <option value="runs">Sort by Runs</option>
                         <option value="wickets">Sort by Wickets</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- Bulk Actions (Admin Only) -->
+            <div class="card mb-2" id="bulkActionsCard" style="display: none;">
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="selectAllCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-weight: 500;">Select All</span>
+                    </label>
+                    <span id="selectedCount" style="color: #666;">0 selected</span>
+                    <button id="bulkDeleteBtn"
+                            class="btn btn-danger"
+                            style="margin-left: auto; display: none;">
+                        Delete Selected
+                    </button>
                 </div>
             </div>
 
@@ -60,11 +76,20 @@
     <script src="/js/main.js"></script>
     <script>
         let allPlayers = [];
+        let selectedPlayers = new Set();
+        let isAdmin = false;
 
         async function loadPlayers() {
             try {
                 const response = await fetch('/api/players');
                 allPlayers = await response.json();
+
+                // Check if user is admin
+                isAdmin = checkAdminStatus();
+                if (isAdmin) {
+                    document.getElementById('bulkActionsCard').style.display = 'block';
+                }
+
                 displayPlayers();
             } catch (error) {
                 console.error('Failed to load players:', error);
@@ -101,7 +126,17 @@
             }
 
             grid.innerHTML = filtered.map(player => `
-                <div class="card player-card">
+                <div class="card player-card" style="position: relative;">
+                    ${isAdmin ? `
+                        <label style="position: absolute; top: 10px; left: 10px; z-index: 10; cursor: pointer;">
+                            <input type="checkbox"
+                                   class="player-checkbox"
+                                   data-player-id="${player.id}"
+                                   ${selectedPlayers.has(player.id) ? 'checked' : ''}
+                                   style="width: 20px; height: 20px; cursor: pointer;"
+                                   onclick="togglePlayerSelection(${player.id})">
+                        </label>
+                    ` : ''}
                     <img src="${player.photo_path || '/images/default-logo.png'}"
                          alt="${player.name}"
                          class="player-photo"
@@ -123,10 +158,86 @@
                     </div>
                 </div>
             `).join('');
+
+            updateSelectionUI();
+        }
+
+        function togglePlayerSelection(playerId) {
+            if (selectedPlayers.has(playerId)) {
+                selectedPlayers.delete(playerId);
+            } else {
+                selectedPlayers.add(playerId);
+            }
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const selectedCount = selectedPlayers.size;
+            document.getElementById('selectedCount').textContent = `${selectedCount} selected`;
+            document.getElementById('bulkDeleteBtn').style.display = selectedCount > 0 ? 'block' : 'none';
+
+            // Update select all checkbox
+            const allCheckbox = document.getElementById('selectAllCheckbox');
+            if (allCheckbox) {
+                allCheckbox.checked = selectedCount > 0 && selectedCount === allPlayers.length;
+                allCheckbox.indeterminate = selectedCount > 0 && selectedCount < allPlayers.length;
+            }
+        }
+
+        function selectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox.checked) {
+                // Select all players
+                allPlayers.forEach(player => selectedPlayers.add(player.id));
+            } else {
+                // Deselect all
+                selectedPlayers.clear();
+            }
+            displayPlayers();
+        }
+
+        async function bulkDeletePlayers() {
+            if (selectedPlayers.size === 0) {
+                alert('No players selected');
+                return;
+            }
+
+            const confirmMsg = `Are you sure you want to delete ${selectedPlayers.size} player(s)? This action cannot be undone.`;
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/players/bulk-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        player_ids: Array.from(selectedPlayers)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    selectedPlayers.clear();
+                    loadPlayers(); // Reload players
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete players'));
+                }
+            } catch (error) {
+                console.error('Failed to delete players:', error);
+                alert('Failed to delete players. Please try again.');
+            }
         }
 
         document.getElementById('searchInput').addEventListener('input', displayPlayers);
         document.getElementById('sortSelect').addEventListener('change', displayPlayers);
+        document.getElementById('selectAllCheckbox').addEventListener('change', selectAll);
+        document.getElementById('bulkDeleteBtn').addEventListener('click', bulkDeletePlayers);
         document.addEventListener('DOMContentLoaded', loadPlayers);
     </script>
 </body>
