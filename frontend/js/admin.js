@@ -3,6 +3,7 @@
 let teams = [];
 let players = [];
 let matches = [];
+let selectedPlayers = new Set();
 
 // Check admin authentication
 async function checkAdminAuth() {
@@ -182,12 +183,20 @@ async function loadPlayers() {
 
         const tbody = document.getElementById('playersTableBody');
         if (players.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No players found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No players found</td></tr>';
             return;
         }
 
         tbody.innerHTML = players.map(player => `
             <tr>
+                <td>
+                    <input type="checkbox"
+                           class="player-checkbox"
+                           data-player-id="${player.id}"
+                           ${selectedPlayers.has(player.id) ? 'checked' : ''}
+                           onchange="togglePlayerSelection(${player.id})"
+                           style="width: 18px; height: 18px; cursor: pointer;">
+                </td>
                 <td><strong>${player.name}</strong></td>
                 <td>${player.team_name}</td>
                 <td>${player.role}</td>
@@ -199,6 +208,8 @@ async function loadPlayers() {
                 </td>
             </tr>
         `).join('');
+
+        updatePlayerSelectionUI();
     } catch (error) {
         console.error('Failed to load players:', error);
     }
@@ -541,3 +552,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadMatches();
     loadTournamentSettings();
 });
+
+// ===== BULK DELETE PLAYERS =====
+
+function togglePlayerSelection(playerId) {
+    if (selectedPlayers.has(playerId)) {
+        selectedPlayers.delete(playerId);
+    } else {
+        selectedPlayers.add(playerId);
+    }
+    updatePlayerSelectionUI();
+}
+
+function toggleSelectAllPlayers() {
+    const selectAllCheckbox = document.getElementById('selectAllPlayers');
+    if (selectAllCheckbox.checked) {
+        // Select all players
+        players.forEach(player => selectedPlayers.add(player.id));
+    } else {
+        // Deselect all
+        selectedPlayers.clear();
+    }
+    loadPlayers(); // Refresh to update checkboxes
+}
+
+function updatePlayerSelectionUI() {
+    const selectedCount = selectedPlayers.size;
+    document.getElementById('selectedPlayersCount').textContent = selectedCount;
+    document.getElementById('bulkDeletePlayersBtn').style.display = selectedCount > 0 ? 'inline-block' : 'none';
+
+    // Update select all checkbox
+    const selectAllCheckbox = document.getElementById('selectAllPlayers');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = selectedCount > 0 && selectedCount === players.length;
+        selectAllCheckbox.indeterminate = selectedCount > 0 && selectedCount < players.length;
+    }
+}
+
+async function bulkDeletePlayers() {
+    if (selectedPlayers.size === 0) {
+        alert('No players selected');
+        return;
+    }
+
+    const confirmMsg = `Are you sure you want to delete ${selectedPlayers.size} player(s)? This action cannot be undone.`;
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/players/bulk-delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                player_ids: Array.from(selectedPlayers)
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(data.message);
+            selectedPlayers.clear();
+            loadPlayers();
+            loadStats();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to delete players'));
+        }
+    } catch (error) {
+        console.error('Failed to delete players:', error);
+        alert('Failed to delete players. Please try again.');
+    }
+}

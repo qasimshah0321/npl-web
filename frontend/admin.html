@@ -77,11 +77,17 @@
             <div id="playersTab" class="tab-content">
                 <div class="admin-actions">
                     <button class="btn btn-primary" onclick="showAddPlayerModal()">Add New Player</button>
+                    <button class="btn btn-danger" id="bulkDeletePlayersBtn" onclick="bulkDeletePlayers()" style="display: none; margin-left: 10px;">
+                        Delete Selected (<span id="selectedPlayersCount">0</span>)
+                    </button>
                 </div>
                 <div class="card">
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAllPlayers" onchange="toggleSelectAllPlayers()" style="width: 18px; height: 18px; cursor: pointer;">
+                                </th>
                                 <th>Name</th>
                                 <th>Team</th>
                                 <th>Role</th>
@@ -91,7 +97,7 @@
                             </tr>
                         </thead>
                         <tbody id="playersTableBody">
-                            <tr><td colspan="6" class="loading">Loading...</td></tr>
+                            <tr><td colspan="7" class="loading">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
